@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#btn1").click(function(){
+                $.ajax({
+            url: "https://localhost:7185/api/Department",
+            success: function (result) {
+                let table = document.getElementsByTagName("table")[0];
+                for (let x of result) {
+                    let row  = document.createElement("tr");
+                    let column1 = document.createElement("td");
+                    column1.textContent = x.name;
+                    row.appendChild(column1);
+                    table.appendChild(row);
+                }
+                    console.log(result)
+    }});
+            });
+            let deptid = document.getElementById("deptid");
+            let id;
+            deptid.oninput = function(){
+                id = parseInt(deptid.value);
+            }
+            $("#btn2").click(function(){
+                $.ajax({
+                    url: `https://localhost:7185/api/Department/${id}`,
+                    success: function (result) {
+                        let div = document.getElementById("single");
+                        div.innerHTML += result.name;
+                        div.innerHTML +=  `<br/>`;
+                        div.innerHTML += result.location;
+                        div.innerHTML +=  `<br/>`;
+                        div.innerHTML += result.id;
+                        div.innerHTML +=  `<br/>`;
+                        result.students.forEach(element => {
+                            div.innerHTML += element;
+                            div.innerHTML +=  `<br/>`;
+                        });
+                    }
+                });
+            });
+
+            $("#btn3").click(function(){
+                $.ajax({
+                    url: `https://localhost:7185/api/Department/${id}`,
+                    method: "DELETE",
+                    data: {id:id},
+                    success: function (result) {
+                        alert("dept deleted successfully");
+                    }
+                });
+            });
+            $("form").submit(function(){
+                event.preventDefault();
+                var dept = {
+                    Id: 5,
+                    Name: $("#Name").val(),
+                    Location : $("#Location").val(),
+                    OpenDate : $("#Date").val()
+                }
+                $.ajax({
+                    url: `https://localhost:7185/api/Department`,
+                    method: "POST",
+                    contentType: "application/json",
+                    data : JSON.stringify(dept),
+                    success: function (result) {
+                        alert("dept created successfully");
+                    },
+                    error: function()
+                    {
+                        console.log(JSON.stringify(dept));
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <button id="btn1">Get All Depts</button>
+    <div id="div1">
+        <h2>get all</h2>
+        <table>
+        </table>    
+    </div>
+
+
+    <button id="btn2">Get By Id</button>
+    <input type="number" id="deptid">
+    <div id="single">
+    </div>
+    <br/>
+    <button id="btn3">Delete</button>
+    <br/>
+    <form>
+        <br>
+        <label for="id">Dept ID</label>
+        <input type="number" name="Id"> 
+        <br>
+        <label for="Name">Dept name</label>
+        <input type="text" name="Name" id="Name" required>
+        <br>
+        <label for="Location">Dept Location</label>
+        <select name="Location" id="Location">
+            <option value="eg">Egypt</option>
+            <option value="usa">USA</option>
+        </select>
+        <br>
+        <label for="Date">Open Date</label>
+        <input type="Date" name="Date" id="Date">
+        <br>
+        <input type="submit" value="add dept">
+    </form>
+</body>
+</html>
